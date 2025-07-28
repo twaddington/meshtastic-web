@@ -36,7 +36,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
   const currentPosition = useMemo(() => ({
     latitude: (node?.position?.latitudeI ?? 0.0) * 1e-7,
     longitude: (node?.position?.longitudeI ?? 0.0) * 1e-7,
-    altitude: node?.position?.altitude ?? 0.0,
+    altitude: node?.position?.altitude ?? 0,
   }), [node]);
 
   const onSubmit = (data: PositionValidation) => {
@@ -73,9 +73,9 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       formId="Config_PositionConfig"
       defaultValues={{
         ...config.position,
-        latitude: 0.0,
-        longitude: 0.0,
-        altitude: 0.0,
+        latitude: currentPosition.latitude,
+        longitude: currentPosition.longitude,
+        altitude: currentPosition.altitude,
       }}
       values={{
         ...positionConfig,
