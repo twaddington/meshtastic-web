@@ -15,7 +15,7 @@ import {
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 interface PositionConfigProps {
@@ -24,12 +24,20 @@ interface PositionConfigProps {
 export const Position = ({ onFormInit }: PositionConfigProps) => {
   useWaitForConfig({ configCase: "position" });
 
-  const { setWorkingConfig, config, getEffectiveConfig, removeWorkingConfig } =
+  const { setWorkingConfig, config, getEffectiveConfig, removeWorkingConfig, getMyNode } =
     useDevice();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     getEffectiveConfig("position")?.positionFlags ?? 0,
   );
   const { t } = useTranslation("deviceConfig");
+
+  const positionConfig = getEffectiveConfig("position");
+  const node = useMemo(getMyNode, [config]);
+  const currentPosition = useMemo(() => ({
+    latitude: (node?.position?.latitudeI ?? 0.0) * 1e-7,
+    longitude: (node?.position?.longitudeI ?? 0.0) * 1e-7,
+    altitude: node?.position?.altitude ?? 0.0,
+  }), [node]);
 
   const onSubmit = (data: PositionValidation) => {
     if (deepCompareConfig(config.position, data, true)) {
@@ -63,8 +71,18 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       onFormInit={onFormInit}
       validationSchema={PositionValidationSchema}
       formId="Config_PositionConfig"
-      defaultValues={config.position}
-      values={getEffectiveConfig("position")}
+      defaultValues={{
+        ...config.position,
+        latitude: 0.0,
+        longitude: 0.0,
+        altitude: 0.0,
+      }}
+      values={{
+        ...positionConfig,
+        latitude: currentPosition.latitude,
+        longitude: currentPosition.longitude,
+        altitude: currentPosition.altitude,
+      }}
       fieldGroups={[
         {
           label: t("position.title"),
@@ -90,6 +108,39 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               name: "fixedPosition",
               label: t("position.fixedPosition.label"),
               description: t("position.fixedPosition.description"),
+            },
+            {
+              type: "number",
+              name: "latitude",
+              label: t("position.latitude.label"),
+              description: t("position.latitude.description"),
+              disabledBy: [
+                {
+                  fieldName: "fixedPosition",
+                },
+              ],
+            },
+            {
+              type: "number",
+              name: "longitude",
+              label: t("position.longitude.label"),
+              description: t("position.longitude.description"),
+              disabledBy: [
+                {
+                  fieldName: "fixedPosition",
+                },
+              ],
+            },
+            {
+              type: "number",
+              name: "altitude",
+              label: t("position.altitude.label"),
+              description: t("position.altitude.description"),
+              disabledBy: [
+                {
+                  fieldName: "fixedPosition",
+                },
+              ],
             },
             {
               type: "multiSelect",

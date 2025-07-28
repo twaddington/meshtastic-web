@@ -283,6 +283,18 @@
 			"description": "Don't report GPS position, but a manually-specified one",
 			"label": "Fixed Position"
 		},
+		"latitude": {
+			"description": "Latitude",
+			"label": "Latitude"
+		},
+		"longitude": {
+			"description": "Longitude",
+			"label": "Longitude"
+		},
+		"altitude": {
+			"description": "Altitude (in meters)",
+			"label": "Altitude"
+		},
 		"gpsMode": {
 			"description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
 			"label": "GPS Mode"
